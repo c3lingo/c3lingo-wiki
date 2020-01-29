@@ -1,0 +1,52 @@
+version: '3.3'
+
+# https://containo.us/blog/traefik-2-0-docker-101-fc2893944b9d/
+
+services:
+  traefik:
+    image: "traefik:v2.1.2"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      #- "--api.insecure=true"
+      - "--api"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - --certificatesresolvers.le.acme.email=stb@lassitu.de
+      - --certificatesresolvers.le.acme.storage=/acme/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - acme:/acme
+      - "./admin-users.htpasswd:/htpasswd"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.wiki.c3lingo.org`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=admin"
+      - "traefik.http.routers.traefik.tls.certresolver=le"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.middlewares.admin.basicauth.usersfile=/htpasswd"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+
+  dokuwiki:
+    image: php:apache
+    restart: always
+    volumes:
+      - ./html:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wordpress.rule=Host(`wiki.c3lingo.org`)"
+      - "traefik.http.routers.wordpress.entrypoints=websecure"
+      - "traefik.http.routers.wordpress.tls.certresolver=le"
+
+volumes:
+    acme: {}
