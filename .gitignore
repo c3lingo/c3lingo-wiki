@@ -1,3 +1,5 @@
 html
 admin-users.htpasswd
 *~
+dot.msmtprc
+msmtprc
