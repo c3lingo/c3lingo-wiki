@@ -22,7 +22,7 @@ services:
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - acme:/acme
+      - "acme:/acme"
       - "./admin-users.htpasswd:/htpasswd"
     labels:
       - "traefik.enable=true"
@@ -36,6 +36,21 @@ services:
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+  
+  certsdumper:
+    image: ldez/traefik-certs-dumper
+    restart: always
+    command:
+      - "file"
+      - "--version"
+      - "v2"
+      - "--source"
+      - "/acme/acme.json"
+      - "--dest"
+      - "/certs"
+    volumes:
+      - "acme:/acme"
+      - "./certs:/certs"
 
   dokuwiki:
     build: dokuwiki
@@ -48,6 +63,22 @@ services:
       - "traefik.http.routers.wordpress.rule=Host(`wiki.c3lingo.org`)"
       - "traefik.http.routers.wordpress.entrypoints=websecure"
       - "traefik.http.routers.wordpress.tls.certresolver=le"
+
+  murmur:
+    image: goofball222/murmur
+    restart: always
+    ports:
+      - 64738:64738
+      - 64738:64738/udp
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./murmur/cert:/opt/murmur/cert
+      - ./murmur/config:/opt/murmur/config
+      - ./murmur/data:/opt/murmur/data
+      - ./murmur/log:/opt/murmur/log
+    environment:
+      - TZ=UTC
+      
 
 volumes:
     acme: {}
