@@ -7,7 +7,7 @@ services:
     image: "traefik:v2.1.2"
     container_name: "traefik"
     command:
-      - "--log.level=DEBUG"
+      #- "--log.level=DEBUG"
       #- "--api.insecure=true"
       - "--api"
       - "--providers.docker=true"
@@ -60,9 +60,9 @@ services:
       - ./msmtprc:/etc/msmtprc
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.wordpress.rule=Host(`wiki.c3lingo.org`)"
-      - "traefik.http.routers.wordpress.entrypoints=websecure"
-      - "traefik.http.routers.wordpress.tls.certresolver=le"
+      - "traefik.http.routers.dokuwiki.rule=Host(`wiki.c3lingo.org`)"
+      - "traefik.http.routers.dokuwiki.entrypoints=websecure"
+      - "traefik.http.routers.dokuwiki.tls.certresolver=le"
 
   murmur:
     image: goofball222/murmur
@@ -76,9 +76,25 @@ services:
       - ./murmur/config:/opt/murmur/config
       - ./murmur/data:/opt/murmur/data
       - ./murmur/log:/opt/murmur/log
+      - "./certs:/certs"
     environment:
       - TZ=UTC
+
+  c3lingotest:
+    image: c3lingo/c3lingo-mumble:latest
+    command: "-m c3lingo_mumble.play_wav -c /c3lingo-mumbleweb/test-channel.yaml"
+    volumes:
+      - "./c3lingo-mumbleweb:/c3lingo-mumbleweb"
       
+  mumbleweb:
+    image: c3lingo/mumble-web
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mumble.rule=Host(`mumble.c3lingo.org`)"
+      - "traefik.http.routers.mumble.entrypoints=websecure"
+      - "traefik.http.routers.mumble.tls.certresolver=le"
+
 
 volumes:
     acme: {}
