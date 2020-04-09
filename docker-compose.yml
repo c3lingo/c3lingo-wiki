@@ -7,7 +7,7 @@ services:
     image: "traefik:v2.2"
     container_name: "traefik"
     command:
-      - "--log.level=DEBUG"
+      #- "--log.level=DEBUG"
       - "--api"
       - "--api.dashboard=true"
       #- "--api.insecure=true"
@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.api.service=api@internal"
       - "traefik.http.routers.api.middlewares=admin"
       - "traefik.http.routers.api.tls.certresolver=le"
-      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.entrypoints=web,websecure"
       - "traefik.http.middlewares.admin.basicauth.usersfile=/traefik/admin-users.htpasswd"
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
