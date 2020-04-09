@@ -4,14 +4,17 @@ version: '3.3'
 
 services:
   traefik:
-    image: "traefik:v2.1.2"
+    image: "traefik:v2.2"
     container_name: "traefik"
     command:
-      #- "--log.level=DEBUG"
-      #- "--api.insecure=true"
+      - "--log.level=DEBUG"
       - "--api"
+      - "--api.dashboard=true"
+      #- "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.filename=/traefik/traefik.yaml"
+      #- "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - --certificatesresolvers.le.acme.email=stb@lassitu.de
@@ -20,22 +23,23 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      #- "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "acme:/acme"
-      - "./admin-users.htpasswd:/htpasswd"
+      - "./traefik:/traefik"
     labels:
       - "traefik.enable=true"
-#      - "traefik.http.routers.traefik.rule=Host(`traefik.wiki.c3lingo.org`)"
-#      - "traefik.http.routers.traefik.service=api@internal"
-#      - "traefik.http.routers.traefik.middlewares=admin"
-#      - "traefik.http.routers.traefik.tls.certresolver=le"
-#      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.middlewares.admin.basicauth.usersfile=/htpasswd"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.api.rule=Host(`traefik.c3lingowiki.zs64.net`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.middlewares=admin"
+      - "traefik.http.routers.api.tls.certresolver=le"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.middlewares.admin.basicauth.usersfile=/traefik/admin-users.htpasswd"
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
   
   certsdumper:
     image: ldez/traefik-certs-dumper

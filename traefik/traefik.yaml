@@ -1,0 +1,27 @@
+---
+http:
+  routers:
+    mumble-schedule:
+      entryPoints:
+      - websecure
+      rule: "Host(`mumble.c3lingo.org`) && Path(`/fahrplan.xml`)"
+      priority: 1000
+      middlewares:
+      - mumble-schedule
+      - updateHeadersChaotikum
+      service: schedule
+      tls:
+        certresolver: le
+  middlewares:
+    mumble-schedule:
+      replacePath:
+        path: "/divoc/fahrplan/raw/master/fahrplan.xml"
+    updateHeadersChaotikum:
+      headers:
+        customRequestHeaders:
+          Host: git.chaotikum.org
+  services:
+    schedule:
+      loadBalancer:
+        servers:
+        - url: "https://git.chaotikum.org/"
