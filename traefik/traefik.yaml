@@ -4,7 +4,7 @@ http:
     mumble-schedule:
       entryPoints:
       - websecure
-      rule: "Host(`mumble.c3lingo.org`) && Path(`/fahrplan.xml`)"
+      rule: "Host(`mumble.c3lingo.org`) && Path(`/schedule.json`)"
       priority: 1000
       middlewares:
       - mumble-schedule
@@ -15,13 +15,13 @@ http:
   middlewares:
     mumble-schedule:
       replacePath:
-        path: "/ptt/schedule/export/schedule.xml"
+        path: "/rC3/everything.schedule.json"
     updateHeadersChaotikum:
       headers:
         customRequestHeaders:
-          Host: talks.mrmcd.net
+          Host: data.c3voc.de
   services:
     schedule:
       loadBalancer:
         servers:
-        - url: "https://talks.mrmcd.net/"
+        - url: "https://data.c3voc.de/"
