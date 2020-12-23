@@ -7,3 +7,4 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 COPY msmtp.ini /usr/local/etc/php/conf.d/
+COPY php.ini /usr/local/etc/php
