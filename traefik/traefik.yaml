@@ -15,13 +15,13 @@ http:
   middlewares:
     mumble-schedule:
       replacePath:
-        path: "/divoc/fahrplan/raw/master/fahrplan.xml"
+        path: "/ptt/schedule/export/schedule.xml"
     updateHeadersChaotikum:
       headers:
         customRequestHeaders:
-          Host: git.chaotikum.org
+          Host: talks.mrmcd.net
   services:
     schedule:
       loadBalancer:
         servers:
-        - url: "https://git.chaotikum.org/"
+        - url: "https://talks.mrmcd.net/"
