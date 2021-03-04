@@ -4,7 +4,7 @@ version: '3.3'
 
 services:
   traefik:
-    image: "traefik:v2.2"
+    image: "traefik:v2.4"
     container_name: "traefik"
     command:
       #- "--log.level=DEBUG"
@@ -17,9 +17,12 @@ services:
       #- "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      #- "--certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - --certificatesresolvers.le.acme.email=stb@lassitu.de
       - --certificatesresolvers.le.acme.storage=/acme/acme.json
-      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      #- --certificatesresolvers.le.acme.tlschallenge=true
     ports:
       - "80:80"
       - "443:443"
