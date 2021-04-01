@@ -15,7 +15,7 @@ http:
   middlewares:
     mumble-schedule:
       replacePath:
-        path: "/rC3/everything.schedule.json"
+        path: "/divoc-reboot-to-respawn-2021/schedule/export/schedule.json"
     updateHeadersChaotikum:
       headers:
         customRequestHeaders:
@@ -24,4 +24,4 @@ http:
     schedule:
       loadBalancer:
         servers:
-        - url: "https://data.c3voc.de/"
+        - url: "https://pretalx.c3voc.de/"
